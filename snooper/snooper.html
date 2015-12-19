@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>WebSockets!</title>
+    </head>
+    <body>
+        <p>Logging keypress and mousemove events to server; see console log for details.</p>
+        <script>
+            function exclude(obj, keys) {
+                // Return a copy of the object, excluding the given keys.
+                var newObj = {};
+                for (var key in obj) {
+                    if (keys.indexOf(key) == -1) {
+                        newObj[key] = obj[key];
+                    }
+                }
+                return newObj;
+            }
+
+            var messageList = document.createElement('ul');
+            document.body.appendChild(messageList);
+
+            var ws = new WebSocket("ws://127.0.0.1:1111/");
+            ws.onmessage = function (event) {
+                console.log(event);
+                var message = document.createElement('li');
+                var data = document.createTextNode(event.data);
+                message.appendChild(data);
+                messageList.appendChild(message);
+            };
+
+            circularReferences = [
+                'path',
+                'sourceCapabilities',
+                'srcElement',
+                'target',
+                'toElement',
+                'view',
+                '__proto__',
+                ];
+
+            document.onkeypress = function (event) {
+                console.log(event);
+                ws.send(JSON.stringify(exclude(event, circularReferences)));
+            };
+            document.onmousemove = function (event) {
+                console.log(event);
+                ws.send(JSON.stringify(exclude(event, circularReferences)));
+            };
+        </script>
+    </body>
+</html>
